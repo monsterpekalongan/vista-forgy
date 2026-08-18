@@ -34,13 +34,13 @@ function MainLayout() {
   };
 
   return (
-    <div style={{ minHeight: '100dvh', background: 'var(--bg)', color: 'var(--text)' }}>
-      {/* Desktop Layout Wrapper */}
-      <div style={{ display: 'flex', minHeight: '100dvh' }}>
+    <div className="h-dvh w-full overflow-hidden flex flex-col bg-[var(--bg)] text-[var(--text)]">
+      {/* Desktop & Mobile Main Layout Wrapper */}
+      <div className="flex-1 flex overflow-hidden relative">
         {/* Desktop Left Sidebar (>= 1024px) */}
         <aside
-          className="hidden lg:flex flex-col border-r border-border p-6"
-          style={{ width: 260, flexShrink: 0, background: '#0E121B' }}
+          className="hidden lg:flex flex-col border-r border-border p-6 bg-[#0E121B]"
+          style={{ width: 260, flexShrink: 0 }}
         >
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold font-display text-lg">
@@ -52,7 +52,7 @@ function MainLayout() {
             </div>
           </div>
 
-          <nav className="flex flex-col gap-2 flex-1">
+          <nav aria-label="Desktop Navigation" className="flex flex-col gap-2 flex-1">
             <SidebarBtn icon={<Home size={18} />} label="Beranda" active={screen === 'home'} onClick={() => setScreen('home')} />
             <SidebarBtn icon={<Map size={18} />} label="Peta Skill" active={screen === 'map'} onClick={() => setScreen('map')} />
             <SidebarBtn icon={<Award size={18} />} label="Ujian Promosi" active={screen === 'exam'} onClick={() => setScreen('exam')} />
@@ -63,14 +63,15 @@ function MainLayout() {
         </aside>
 
         {/* Main Content Area */}
-        <main style={{ flex: 1, overflowY: 'auto' }}>
+        <main className="flex-1 overflow-y-auto pb-20 lg:pb-6">
           {renderScreen()}
         </main>
       </div>
 
       {/* Mobile Bottom Tab Bar (< 1024px) */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E121B]/95 backdrop-blur-md border-t border-border flex justify-around items-center py-2"
+        aria-label="Mobile Bottom Navigation"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0E121B]/95 backdrop-blur-md border-t border-border flex justify-around items-center py-2"
         style={{ paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))' }}
       >
         <NavTab icon={<Home size={20} />} label="Beranda" active={screen === 'home'} onClick={() => setScreen('home')} />
