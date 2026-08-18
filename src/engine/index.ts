@@ -9,16 +9,20 @@ import { genInvEoq } from './generators/inv';
 import { genAntMm1 } from './generators/ant';
 import { genProBayes, genProKombinasi, genInfCiMean } from './generators/pro';
 import { genUniBreakEven, genUniBungaMajemuk, genUniMarginMarkup } from './generators/uni';
+import { genTrgIstimewa } from './generators/trg';
+import { genLinMatrixOps } from './generators/lin';
+import { genEkoNpv } from './generators/eko';
 
 export type { QuestionSpec, NodeConfig, Knobs };
 
 const GENERATORS: Record<string, (rng: ReturnType<typeof mulberry32>, skillId: string, seed: number, knobs: Knobs) => QuestionSpec> = {
+  // Aritmetika
   'ari.tambah': (rng, sid, s, k) => genAriTambah(rng, sid, s, k),
   'ari.kurang': (rng, sid, s, k) => genAriKurang(rng, sid, s, k),
   'ari.kali': (rng, sid, s, k) => genAriKali(rng, sid, s, k),
   'ari.bagi': (rng, sid, s, k) => genAriBagi(rng, sid, s, k),
   'ari.campur': (rng, sid, s, k) => genAriCampur(rng, sid, s, k),
-  'ari.negatif': (rng, sid, s, _k) => genAriNegatif(rng, sid, s, _k),
+  'ari.negatif': (rng, sid, s, k) => genAriNegatif(rng, sid, s, k),
   'ari.pecahan': (rng, sid, s, k) => genAriPecahan(rng, sid, s, k),
   'ari.desimal': (rng, sid, s, k) => genAriDesimal(rng, sid, s, k),
   'ari.bulat': (rng, sid, s, k) => genAriBulat(rng, sid, s, k),
@@ -26,27 +30,38 @@ const GENERATORS: Record<string, (rng: ReturnType<typeof mulberry32>, skillId: s
   'ari.rasio': (rng, sid, s, k) => genAriRasio(rng, sid, s, k),
   'ari.satuan': (rng, sid, s, k) => genAriSatuan(rng, sid, s, k),
 
+  // Aljabar
   'alj.linear1': (rng, sid, s) => genAljLinear1(rng, sid, s),
   'alj.linear2': (rng, sid, s) => genAljLinear2(rng, sid, s),
   'alj.kuadrat': (rng, sid, s) => genAljKuadrat(rng, sid, s),
   'alj.sistem2var': (rng, sid, s) => genAljSistem2Var(rng, sid, s),
   'alj.eksponen': (rng, sid, s) => genAljEksponen(rng, sid, s),
+  'alj2.word-linear': (rng, sid, s) => genAljSistem2Var(rng, sid, s),
 
+  // Kalkulus
   'kald.power': (rng, sid, s) => genKaldPower(rng, sid, s),
   'kald.chain': (rng, sid, s) => genKaldChainFixed(rng, sid, s),
   'kald.limit': (rng, sid, s) => genKaldLimit(rng, sid, s),
 
+  // Trigonometri & Aljabar Linear
+  'trg.istimewa': (rng, sid, s) => genTrgIstimewa(rng, sid, s),
+  'lin.matrix-ops': (rng, sid, s) => genLinMatrixOps(rng, sid, s),
+
+  // Riset Operasi & Industri
   'rso.lp-grafis': (rng, sid, s) => genRsoLpGrafis(rng, sid, s),
   'rso.transportasi': (rng, sid, s) => genRsoTransportasi(rng, sid, s),
   'rso.pert': (rng, sid, s) => genRsoPert(rng, sid, s),
 
   'inv.eoq': (rng, sid, s) => genInvEoq(rng, sid, s),
   'ant.mm1': (rng, sid, s) => genAntMm1(rng, sid, s),
+  'eko.npv': (rng, sid, s) => genEkoNpv(rng, sid, s),
 
+  // Probabilitas & Inferensial
   'pro.bayes': (rng, sid, s) => genProBayes(rng, sid, s),
   'pro.kombinasi': (rng, sid, s) => genProKombinasi(rng, sid, s),
   'inf.ci-mean': (rng, sid, s) => genInfCiMean(rng, sid, s),
 
+  // Universal
   'uni.break-even': (rng, sid, s) => genUniBreakEven(rng, sid, s),
   'uni.bunga-majemuk': (rng, sid, s) => genUniBungaMajemuk(rng, sid, s),
   'uni.margin-markup': (rng, sid, s) => genUniMarginMarkup(rng, sid, s),
@@ -62,11 +77,7 @@ export function generateQuestion(
   const seed = seedFromString(seedStr);
   const rng = mulberry32(seed);
 
-  const generator = GENERATORS[skillId];
-  if (!generator) {
-    // Fallback to a default arithmetic question
-    return genAriTambah(rng, skillId, seed, knobs);
-  }
+  const generator = GENERATORS[skillId] || GENERATORS['ari.campur'];
 
   let attempts = 0;
   while (attempts < 25) {
